@@ -18,8 +18,25 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
 
+public class MainActivity extends AppCompatActivity {
+    public static class User {
+
+        public String date_of_birth;
+        public String full_name;
+        public String nickname;
+
+        public User(String dateOfBirth, String fullName) {
+            // ...
+        }
+
+        public User(String dateOfBirth, String fullName, String nickname) {
+            // ...
+        }
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,14 +45,17 @@ public class MainActivity extends AppCompatActivity {
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
+        DatabaseReference myRef2 = database.getReference("message2");
+        myRef2.setValue("sdf");
         EditText base_mess = (EditText) findViewById(R.id.editTextText);
-
+        TextView text1 = (TextView) findViewById(R.id.textView2);
 
 
         button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                TextView text1 = (TextView) findViewById(R.id.textView2);
-                myRef.setValue(text1.getText().toString());
+                Map<String, String> users = new HashMap<>();
+                users.put("alanisawesome", "sdfsdf");
+                myRef.setValue(users);
             }
         });
         myRef.addValueEventListener(new ValueEventListener() {
@@ -44,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 String value = dataSnapshot.getValue(String.class);
-                base_mess.setText("Value is: " + value);
+                text1.setText("Value is: " + value);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                base_mess.setText("Failed to read value.");
+                text1.setText("Failed to read value.");
             }
         });
     }
