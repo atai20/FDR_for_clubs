@@ -1,14 +1,11 @@
 package com.example.fdrforclubs;
 
-import static android.content.ContentValues.TAG;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,10 +22,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     public static class User {
@@ -77,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button button1 = (Button)findViewById(R.id.send_button);
+        Button button_reg = (Button)findViewById(R.id.button_register);
+        Button button_log = (Button)findViewById(R.id.button_login);
 
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -89,6 +84,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 myRef.child("chess").push().setValue(base_mess.getText().toString());
+
+            }
+        });
+        button_reg.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent main_page = new Intent (MainActivity.this, RegisterPage.class);
+                startActivity(main_page);
+            }
+        });
+        button_log.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent main_page = new Intent (MainActivity.this, LoginPage.class);
+                startActivity(main_page);
             }
         });
         Query chess_list = myRef.orderByValue().limitToFirst(3);
