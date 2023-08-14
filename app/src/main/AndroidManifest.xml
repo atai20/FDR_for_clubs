@@ -13,8 +13,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FDRForClubs"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Club_Join"
+            android:exported="false" />
+        <activity
+            android:name=".CreatePost"
+            android:exported="false" />
+        <activity
+            android:name=".LoginPage"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterPage"
             android:exported="false" />
         <activity
             android:name=".First_script"

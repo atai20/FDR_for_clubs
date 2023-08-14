@@ -4,26 +4,56 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_REQUEST = 22;
+    private Button btnSelect, btnUpload;
+
+
+
+    // Override onActivityResult method
+
+    // UploadImage method
+
     public static class User {
 
         public String date_of_birth;
@@ -37,6 +67,23 @@ public class MainActivity extends AppCompatActivity {
         public User(String dateOfBirth, String fullName, String nickname) {
             // ...
         }
+
+    }
+    public static class Post {
+
+        public String desc_text;
+
+        public String nickname;
+
+        public Post() {
+            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        }
+
+        public Post(String desc_text, String nickname) {
+            this.desc_text = desc_text;
+            this.nickname = nickname;
+        }
+
 
     }
     public void onButtonShowPopupWindowClick(View view) {
@@ -65,31 +112,73 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button1 = (Button)findViewById(R.id.send_button);
+        Button button2 = (Button)findViewById(R.id.button2);
+
         Button button_reg = (Button)findViewById(R.id.button_register);
         Button button_log = (Button)findViewById(R.id.button_login);
 
+        Button button_cr_post = (Button)findViewById(R.id.butt_create_post);
+        Button button_join = (Button)findViewById(R.id.join_butt);
+        Button button_info = (Button)findViewById(R.id.how_look_like);
+        Button button_conc = (Button)findViewById(R.id.button9);
+
+
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("clubs");
-        EditText base_mess = (EditText) findViewById(R.id.editTextText);
+
+
+       DatabaseReference myRef = database.getReference("clubs");
         TextView text1 = (TextView) findViewById(R.id.textView2);
+// Create a Cloud Storage reference from the app
+
+// Create a reference to "mountains.jpg"
 
 
-        button1.setOnClickListener(new View.OnClickListener() {
+// Register observers to listen for when the download is done or if it fails
+
+
+
+        button2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                myRef.child("chess").push().setValue(base_mess.getText().toString());
-
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(MainActivity.this, "You have logged out",
+                        Toast.LENGTH_SHORT).show();
             }
         });
         button_reg.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent main_page = new Intent (MainActivity.this, RegisterPage.class);
+                startActivity(main_page);
+            }
+        });
+        button_cr_post.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent main_page = new Intent (MainActivity.this, CreatePost.class);
+                startActivity(main_page);
+            }
+        });
+        button_conc.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent main_page = new Intent (MainActivity.this, First_script.class);
+                startActivity(main_page);
+            }
+        });
+        button_info.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                setContentView(R.layout.club_profile);
+
+            }
+        });
+        button_join.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent main_page = new Intent (MainActivity.this, Club_Join.class);
                 startActivity(main_page);
             }
         });
@@ -130,12 +219,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 str = "";
-                text1.setText(error.toString());
+                text1.setText("database error (object canceled)");
             }
 
             public void returnVal(DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    str = str+"  "+dsp.getValue().toString()+"   \n";
+                    if(dsp.child("nickname").getValue()!=null && dsp.child("desc_text").getValue()!=null){
+                        str = str+":  "+dsp.child("nickname").getValue()+":\n      "+dsp.child("desc_text").getValue()+"\n\n";
+                    }
                 }
                 text1.setText(str);
 

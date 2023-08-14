@@ -7,9 +7,11 @@
     tools:context=".First_script">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="//lorem ipsum//"
+        android:layout_width="348dp"
+        android:layout_height="447dp"
+        android:text="Hi I'm your classmate, my name is Atai, I made this app for you so you can coordinate in clubs, school news and learning features in FDR. Also here you can see new clubs publications, or if you are a member of club yourself, you can publish news yourself here as well. Most importantly have fun and enjoy this app. I've made some guidelines about this school that can help you if you came from different counrty. Good luck and have an amazing experience!"
+
+        android:textSize="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
