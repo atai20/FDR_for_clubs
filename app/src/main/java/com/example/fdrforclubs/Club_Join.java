@@ -1,6 +1,12 @@
 package com.example.fdrforclubs;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,7 +31,7 @@ public class Club_Join extends AppCompatActivity {
 
         DatabaseReference myRef = database.getReference();
         Query chess_list = myRef.orderByValue();
-        TextView text1 = (TextView)findViewById(R.id.clubs_list);
+        LinearLayout linearlyout_find_clubs = (LinearLayout) findViewById(R.id.linearlayout_find_clubs);
         chess_list.addChildEventListener(new ChildEventListener() {
             String str = "";
             @Override
@@ -56,15 +62,32 @@ public class Club_Join extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 str = "";
-                text1.setText("database error (object canceled)");
+
             }
 
             public void returnVal(DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    str = str+":  "+dsp.child("clubs")+"\n";
+                    str = str+":  "+dsp.getKey()+"\n";
+                    View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
+
+
+
+                    TextView tv = (TextView)cardView.findViewById(R.id.card_textview);
+                    Button check_club = (Button)cardView.findViewById(R.id.go_to_page);
+                    check_club.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            Club_Name dred = new Club_Name();
+                            dred.club_id = "sdfsdf";
+                            Intent club = new Intent (Club_Join.this, Club_Name.class);
+                            startActivity(club);
+                        }
+                    });
+                    TextView textView = new TextView(new ContextThemeWrapper(getApplicationContext(), R.style.CardView1), null, 0);
+                    tv.setText(str);
+                    linearlyout_find_clubs.addView(cardView);
                 }
-                text1.setText(str);
+
 
             }
 

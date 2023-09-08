@@ -32,10 +32,10 @@ public class RegisterPage extends AppCompatActivity {
     }
     public static class User {
 
+        public String name;
         public String email;
-        public String home_lang;
         public String club;
-        public String description;
+        public String status;
 
 
 
@@ -51,8 +51,10 @@ public class RegisterPage extends AppCompatActivity {
 
 
     }
+    FirebaseAuth mAuth2;
     protected void create_account(String email, String password){
         mAuth = FirebaseAuth.getInstance();
+
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -60,16 +62,18 @@ public class RegisterPage extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-                            DatabaseReference myRef = database.getReference("clubs");
-                            DatabaseReference myRefUsers = database.getReference();
+                            mAuth2 = FirebaseAuth.getInstance();
+                            DatabaseReference usersRef = database.getReference("Users");
+                            FirebaseUser currentUser = mAuth2.getCurrentUser();
+                            CreatePost.Users new_user = new CreatePost.Users("Ivan Benyatov", email, "chess", "admin");
+                            usersRef.child(currentUser.getUid()).setValue(new_user);
 
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+
                             FirebaseAuth mAuth;
                             mAuth = FirebaseAuth.getInstance();
-                            User new_pos = new User(email);
-                            myRefUsers.child("Users").push().setValue(new_pos);
+
                             detailing_register();
                                 //put new storage uploading
                                 // Defining Implicit Intent to mobile gallery
@@ -82,6 +86,8 @@ public class RegisterPage extends AppCompatActivity {
                         }
                     }
                 });
+
+
     }
     private void detailing_register(){
         setContentView(R.layout.register);
@@ -94,10 +100,13 @@ public class RegisterPage extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.button);
         EditText email = (EditText) findViewById(R.id.editTextText3);
         EditText password = (EditText) findViewById(R.id.editTextTextPassword);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 create_account(email.getText().toString(), password.getText().toString());
+
+
             }
         });
         // Initialize Firebase Auth

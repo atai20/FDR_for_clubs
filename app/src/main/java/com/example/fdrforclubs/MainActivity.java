@@ -3,6 +3,7 @@ package com.example.fdrforclubs;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,6 +13,8 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,8 +27,10 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -35,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -43,7 +49,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
-
+import com.squareup.picasso.Picasso;
 public class MainActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 22;
     private Button btnSelect, btnUpload;
@@ -54,21 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
     // UploadImage method
 
-    public static class User {
 
-        public String date_of_birth;
-        public String full_name;
-        public String nickname;
 
-        public User(String dateOfBirth, String fullName) {
-            // ...
-        }
 
-        public User(String dateOfBirth, String fullName, String nickname) {
-            // ...
-        }
 
-    }
     public static class Post {
 
         public String desc_text;
@@ -112,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    static String user_club_name;
+    static String user_status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,10 +127,131 @@ public class MainActivity extends AppCompatActivity {
 
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        DatabaseReference usersRef;
+
+        ImageView imageView = findViewById(R.id.imageView3);
+
+        usersRef = database.getReference("Users");
+        DatabaseReference user_return;
 
 
-       DatabaseReference myRef = database.getReference("clubs");
-        TextView text1 = (TextView) findViewById(R.id.textView2);
+        DatabaseReference myRef2 = database.getReference("clubs");
+
+        DatabaseReference usersRef2 = database.getReference("Users");
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+
+
+        StorageReference mountainImagesRef = storageRef.child("images/7cbc0f07-3f4b-4249-9bf6-4cc029bc8f8e");
+        mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                // Pass it to Picasso to download, show in ImageView and caching
+                Picasso.get().load(uri.toString()).into(imageView);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(MainActivity.this,
+                        "fail",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        if (currentUser!=null) {
+            usersRef2.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (!task.isSuccessful()) {
+                        Log.e("firebaseno", "Error getting data", task.getException());
+
+                    } else {
+                        Log.e("firebaseno", task.getResult().child("status").getValue().toString(), task.getException());
+                        String stat = task.getResult().child("status").getValue().toString();
+                        if (!stat.equals(null)) {
+                            user_club_name = task.getResult().child("club").getValue().toString();
+                            user_status = task.getResult().child("status").getValue().toString();
+                            TextView textView = new TextView(new ContextThemeWrapper(getApplicationContext(), R.style.CardView1), null, 0);
+
+
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference storageRef = storage.getReference();
+
+
+                            StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
+
+
+                            DatabaseReference myRef = database.getReference("clubs").child("chess").child("posts");
+                            Query club_list = myRef.orderByValue();
+                            StorageReference listRef = storage.getReference().child("images/");
+
+
+
+                            // loading that data into rImage
+                            // variable which is ImageView
+                                myRef.addChildEventListener(new ChildEventListener() {
+                                String str = "";
+                                @Override
+                                public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                                    str = "";
+                                    returnVal(dataSnapshot);
+                                }
+
+                                @Override
+                                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                    str = "";
+
+                                    returnVal(snapshot);
+                                }
+
+                                @Override
+                                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                                    str = "";
+                                    returnVal(snapshot);
+                                }
+
+                                @Override
+                                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                    str = "";
+                                    returnVal(snapshot);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    str = "";
+
+                                }
+
+                                public void returnVal(DataSnapshot dataSnapshot) {
+
+                                    View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
+                                    TextView tv = (TextView)cardView.findViewById(R.id.card_textview);
+                                        LinearLayout linearLayout = findViewById(R.id.layout1);
+
+                                        tv.setText(dataSnapshot.child("nickname").getValue().toString()+": "+dataSnapshot.child("desc_text").getValue().toString());
+                                        linearLayout.addView(cardView);
+
+
+
+
+                                }
+
+                            });
+
+                        }
+
+                    }
+                }
+            });
+
+
+
+        }
+
 // Create a Cloud Storage reference from the app
 
 // Create a reference to "mountains.jpg"
@@ -188,52 +306,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(main_page);
             }
         });
-        Query chess_list = myRef.orderByValue().limitToFirst(3);
-        chess_list.addChildEventListener(new ChildEventListener() {
-            String str = "";
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-                str = "";
-                returnVal(dataSnapshot);
-            }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                str = "";
-
-                returnVal(snapshot);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                str = "";
-                returnVal(snapshot);
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                str = "";
-                returnVal(snapshot);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                str = "";
-                text1.setText("database error (object canceled)");
-            }
-
-            public void returnVal(DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    if(dsp.child("nickname").getValue()!=null && dsp.child("desc_text").getValue()!=null){
-                        str = str+":  "+dsp.child("nickname").getValue()+":\n      "+dsp.child("desc_text").getValue()+"\n\n";
-                    }
-                }
-                text1.setText(str);
-
-            }
-
-        });
 
 
     }

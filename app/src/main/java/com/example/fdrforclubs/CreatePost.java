@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,12 +16,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -37,9 +43,10 @@ public class CreatePost extends AppCompatActivity {
     StorageReference storageRef = storage.getReference();
 
 
+
     // view for image view
     private ImageView imageView;
-    StorageReference mountainsRef = storageRef.child("mountains.jpg");
+
 
     // Create a reference to 'images/mountains.jpg'
     StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
@@ -54,6 +61,28 @@ public class CreatePost extends AppCompatActivity {
     UploadTask uploadTask = riversRef.putFile(file);
     // Uri indicates, where the image will be picked from
     private Uri filePath;
+    public static class Users {
+
+        public String name;
+
+        public String email;
+        public String club;
+        public String status;
+
+
+        public Users() {
+            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        }
+
+        public Users(String name, String email, String club, String status) {
+            this.name = name;
+            this.email = email;
+            this.club = club;
+            this.status = status;
+        }
+
+
+    }
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
@@ -112,6 +141,8 @@ public class CreatePost extends AppCompatActivity {
 
             // adding listeners on upload
             // or failure of image
+
+
             ref.putFile(filePath)
                     .addOnSuccessListener(
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -124,11 +155,9 @@ public class CreatePost extends AppCompatActivity {
                                     // Image uploaded successfully
                                     // Dismiss dialog
                                     progressDialog.dismiss();
-                                    Toast
-                                            .makeText(CreatePost.this,
+                                    Toast.makeText(CreatePost.this,
                                                     "Image Uploaded!!",
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
+                                                    Toast.LENGTH_SHORT).show();
                                 }
                             })
 
@@ -171,7 +200,8 @@ public class CreatePost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_post);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("clubs");
+        DatabaseReference myRefMain = database.getReference("clubs");
+        imageView = findViewById(R.id.imageView2);
         Button button1 = (Button)findViewById(R.id.button3);
         Button button_file = (Button)findViewById(R.id.button5);
         Button button_upload = (Button)findViewById(R.id.button6);
@@ -203,8 +233,7 @@ public class CreatePost extends AppCompatActivity {
                 startActivityForResult(
                         Intent.createChooser(
                                 intent,
-                                "Select Image from here..."),
-                        22);
+                                "Select Image from here..."), PICK_IMAGE_REQUEST);
 
             }
         });
@@ -215,15 +244,32 @@ public class CreatePost extends AppCompatActivity {
 
             }
         });
+
         button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                FirebaseAuth mAuth;
-                mAuth = FirebaseAuth.getInstance();
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(currentUser!=null){
                     MainActivity.Post new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail());
 
-                    myRef.child("chess").push().setValue(new_pos);
+                    DatabaseReference myRef = database.getReference("clubs");
+                    Toast.makeText(CreatePost.this, currentUser.getUid(),
+                            Toast.LENGTH_SHORT).show();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference usersRef = database.getReference("Users");
+                    DatabaseReference user_return;
+                    MainActivity mainActivity = new MainActivity();
+                    Toast.makeText(CreatePost.this, mainActivity.user_club_name,
+                            Toast.LENGTH_SHORT).show();
+                    if(!MainActivity.user_status.equals(null)){
+                         new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail());
+                         myRef.child(MainActivity.user_club_name).child("posts").push().setValue(new_pos);
+                         Toast.makeText(CreatePost.this, mainActivity.user_club_name,
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+
+
                     //put new storage uploading
                     // Defining Implicit Intent to mobile gallery
                 }else{
@@ -235,4 +281,16 @@ public class CreatePost extends AppCompatActivity {
             }
         });
     }
+
+    public void returnVal(DataSnapshot dataSnapshot) {
+
+        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+            if(dsp.getValue()!=null){
+                Toast.makeText(CreatePost.this, dsp.child("club").getValue().toString(),
+                        Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(CreatePost.this, "no value here",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }}
 }
