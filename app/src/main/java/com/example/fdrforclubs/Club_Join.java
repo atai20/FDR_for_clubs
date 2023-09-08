@@ -67,8 +67,8 @@ public class Club_Join extends AppCompatActivity {
 
             public void returnVal(DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    str = str+":  "+dsp.getKey()+"\n";
+
+                    str = str+":  "+dataSnapshot.getKey()+"\n";
                     View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
 
 
@@ -86,7 +86,7 @@ public class Club_Join extends AppCompatActivity {
                     TextView textView = new TextView(new ContextThemeWrapper(getApplicationContext(), R.style.CardView1), null, 0);
                     tv.setText(str);
                     linearlyout_find_clubs.addView(cardView);
-                }
+
 
 
             }

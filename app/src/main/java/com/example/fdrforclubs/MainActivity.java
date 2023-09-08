@@ -69,14 +69,15 @@ public class MainActivity extends AppCompatActivity {
         public String desc_text;
 
         public String nickname;
-
+        public String image_path;
         public Post() {
             // Default constructor required for calls to DataSnapshot.getValue(User.class)
         }
 
-        public Post(String desc_text, String nickname) {
+        public Post(String desc_text, String nickname, String image_path) {
             this.desc_text = desc_text;
             this.nickname = nickname;
+            this.image_path = image_path;
         }
 
 
@@ -231,7 +232,22 @@ public class MainActivity extends AppCompatActivity {
                                     View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
                                     TextView tv = (TextView)cardView.findViewById(R.id.card_textview);
                                         LinearLayout linearLayout = findViewById(R.id.layout1);
-
+                                    StorageReference mountainImagesRef = storageRef.child(dataSnapshot.child("image").getValue().toString());
+                                    mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            // Got the download URL for 'users/me/profile.png'
+                                            // Pass it to Picasso to download, show in ImageView and caching
+                                            Picasso.get().load(uri.toString()).into(imageView);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception exception) {
+                                            Toast.makeText(MainActivity.this,
+                                                    "fail",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                         tv.setText(dataSnapshot.child("nickname").getValue().toString()+": "+dataSnapshot.child("desc_text").getValue().toString());
                                         linearLayout.addView(cardView);
 

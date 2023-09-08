@@ -122,6 +122,7 @@ public class CreatePost extends AppCompatActivity {
             }
         }
     }
+    String image_path;
     private void UploadImage()
     {
         if (filePath != null) {
@@ -151,7 +152,8 @@ public class CreatePost extends AppCompatActivity {
                                 public void onSuccess(
                                         UploadTask.TaskSnapshot taskSnapshot)
                                 {
-
+                                    image_path = "images/"
+                                            + UUID.randomUUID().toString();
                                     // Image uploaded successfully
                                     // Dismiss dialog
                                     progressDialog.dismiss();
@@ -250,7 +252,7 @@ public class CreatePost extends AppCompatActivity {
                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(currentUser!=null){
-                    MainActivity.Post new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail());
+                    MainActivity.Post new_pos;
 
                     DatabaseReference myRef = database.getReference("clubs");
                     Toast.makeText(CreatePost.this, currentUser.getUid(),
@@ -262,9 +264,13 @@ public class CreatePost extends AppCompatActivity {
                     Toast.makeText(CreatePost.this, mainActivity.user_club_name,
                             Toast.LENGTH_SHORT).show();
                     if(!MainActivity.user_status.equals(null)){
-                         new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail());
-                         myRef.child(MainActivity.user_club_name).child("posts").push().setValue(new_pos);
-                         Toast.makeText(CreatePost.this, mainActivity.user_club_name,
+                        UploadImage();
+                        new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail(), image_path);
+
+                        myRef.child(MainActivity.user_club_name).child("posts").push().setValue(new_pos);
+
+
+                        Toast.makeText(CreatePost.this, mainActivity.user_club_name,
                                 Toast.LENGTH_SHORT).show();
                     }
 
