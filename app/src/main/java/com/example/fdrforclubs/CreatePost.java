@@ -122,7 +122,7 @@ public class CreatePost extends AppCompatActivity {
             }
         }
     }
-    String image_path;
+    public String image_path;
     private void UploadImage()
     {
         if (filePath != null) {
@@ -152,8 +152,7 @@ public class CreatePost extends AppCompatActivity {
                                 public void onSuccess(
                                         UploadTask.TaskSnapshot taskSnapshot)
                                 {
-                                    image_path = "images/"
-                                            + UUID.randomUUID().toString();
+                                    image_path = UUID.randomUUID().toString();
                                     // Image uploaded successfully
                                     // Dismiss dialog
                                     progressDialog.dismiss();
@@ -265,7 +264,7 @@ public class CreatePost extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     if(!MainActivity.user_status.equals(null)){
                         UploadImage();
-                        new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail(), image_path);
+                        new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail(), image_path.toString());
 
                         myRef.child(MainActivity.user_club_name).child("posts").push().setValue(new_pos);
 

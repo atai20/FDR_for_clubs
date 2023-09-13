@@ -148,21 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         StorageReference mountainImagesRef = storageRef.child("images/7cbc0f07-3f4b-4249-9bf6-4cc029bc8f8e");
-        mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                // Pass it to Picasso to download, show in ImageView and caching
-                Picasso.get().load(uri.toString()).into(imageView);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(MainActivity.this,
-                        "fail",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+
         if (currentUser!=null) {
             usersRef2.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
@@ -231,15 +217,20 @@ public class MainActivity extends AppCompatActivity {
 
                                     View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
                                     TextView tv = (TextView)cardView.findViewById(R.id.card_textview);
+                                    ImageView imageView2 = (ImageView) cardView.findViewById(R.id.imageView4);
                                         LinearLayout linearLayout = findViewById(R.id.layout1);
-                                    StorageReference mountainImagesRef = storageRef.child(dataSnapshot.child("image").getValue().toString());
+                                    StorageReference mountainImagesRef = storageRef.child("images").child(dataSnapshot.child("image").getValue().toString());
+                                    Toast.makeText(MainActivity.this,
+                                            dataSnapshot.child("image").getValue().toString(),
+                                            Toast.LENGTH_SHORT).show();
                                     mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                         @Override
                                         public void onSuccess(Uri uri) {
                                             // Got the download URL for 'users/me/profile.png'
                                             // Pass it to Picasso to download, show in ImageView and caching
-                                            Picasso.get().load(uri.toString()).into(imageView);
-                                        }
+                                            if (uri!=null){
+                                            Picasso.get().load(uri.toString()).into(imageView2);
+                                        }}
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception exception) {
