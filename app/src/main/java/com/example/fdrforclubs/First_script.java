@@ -20,7 +20,7 @@ public class First_script extends AppCompatActivity {
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent main_page = new Intent (First_script.this, MainActivity.class);
+                Intent main_page = new Intent (First_script.this, MainActivity2.class);
                 startActivity(main_page);
             }
         });

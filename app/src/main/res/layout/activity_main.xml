@@ -66,13 +66,9 @@
     </LinearLayout>
 
     <ScrollView
-        android:layout_width="411dp"
-        android:layout_height="440dp"
-        app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:layout_editor_absoluteX="70dp">
 
         <LinearLayout
             android:id="@+id/layout1"
@@ -84,30 +80,31 @@
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="90dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 app:srcCompat="@drawable/ic_launcher_background" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="10dp"
-                app:cardCornerRadius="20dp"
                 android:layout_margin="10dp"
                 app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
                 app:cardMaxElevation="12dp"
                 app:cardPreventCornerOverlap="true"
-                app:cardUseCompatPadding="true" >
+                app:cardUseCompatPadding="true">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
+                    android:text="@string/app_name"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    />
+                    android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
@@ -115,18 +112,18 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="404dp"
-        android:layout_height="79dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="91dp"
             android:layout_height="58dp"
-            android:text="HOME"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="7dp"
+            android:text="home"
             android:textSize="32dp"
             android:textStyle="bold" />
 
@@ -141,6 +138,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="register" />
+
+        <Button
+            android:id="@+id/menu_butt"
+            style='@style/Widget.MaterialComponents.Button.Icon'
+            app:icon="@android:drawable/ic_menu_info_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
 
     </LinearLayout>
 

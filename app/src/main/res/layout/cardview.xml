@@ -24,7 +24,7 @@
         <TextView
             android:id="@+id/card_textview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="37dp"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="27dp"

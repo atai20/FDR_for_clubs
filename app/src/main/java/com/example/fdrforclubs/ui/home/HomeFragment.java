@@ -1,32 +1,29 @@
-package com.example.fdrforclubs;
+package com.example.fdrforclubs.ui.home;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
+
+import com.example.fdrforclubs.MainActivity2;
+import com.example.fdrforclubs.R;
+import com.example.fdrforclubs.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,74 +37,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 import com.squareup.picasso.Picasso;
-public class MainActivity extends AppCompatActivity {
-    private static final int PICK_IMAGE_REQUEST = 22;
-    private Button btnSelect, btnUpload;
 
+public class HomeFragment extends Fragment {
 
+    private FragmentHomeBinding binding;
 
-    // Override onActivityResult method
-
-    // UploadImage method
-
-
-
-
-
-    public static class Post {
-
-        public String desc_text;
-
-        public String nickname;
-        public String image;
-        public Post() {
-            // Default constructor required for calls to DataSnapshot.getValue(User.class)
-        }
-
-        public Post(String desc_text, String nickname, String image) {
-            this.desc_text = desc_text;
-            this.nickname = nickname;
-            this.image = image;
-        }
-
-
-    }
-
-    static String user_club_name;
-    static String user_status;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Button button2 = (Button)findViewById(R.id.button2);
-
-        Button button_reg = (Button)findViewById(R.id.button_register);
-        Button button_log = (Button)findViewById(R.id.button_login);
-
-        Button button_cr_post = (Button)findViewById(R.id.butt_create_post);
-        Button button_join = (Button)findViewById(R.id.join_butt);
-        Button button_info = (Button)findViewById(R.id.how_look_like);
-        Button button_conc = (Button)findViewById(R.id.button9);
-
-
-        // Write a message to the database
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        HomeViewModel homeViewModel =
+                new ViewModelProvider(this).get(HomeViewModel.class);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         DatabaseReference usersRef;
 
-        ImageView imageView = findViewById(R.id.imageView3);
 
         usersRef = database.getReference("Users");
         DatabaseReference user_return;
@@ -124,7 +69,14 @@ public class MainActivity extends AppCompatActivity {
 
         StorageReference mountainImagesRef = storageRef.child("images/7cbc0f07-3f4b-4249-9bf6-4cc029bc8f8e");
 
-        if (currentUser!=null) {
+
+
+
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+
+         if (currentUser!=null) {
             usersRef2.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -135,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("firebaseno", task.getResult().child("status").getValue().toString(), task.getException());
                         String stat = task.getResult().child("status").getValue().toString();
                         if (!stat.equals(null)) {
-                            user_club_name = task.getResult().child("club").getValue().toString();
-                            user_status = task.getResult().child("status").getValue().toString();
-                            TextView textView = new TextView(new ContextThemeWrapper(getApplicationContext(), R.style.CardView1), null, 0);
+                            String user_club_name = task.getResult().child("club").getValue().toString();
+                            String user_status = task.getResult().child("status").getValue().toString();
+                            TextView textView = new TextView(new ContextThemeWrapper(getActivity().getApplicationContext(), R.style.CardView1), null, 0);
 
 
                             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -155,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // loading that data into rImage
                             // variable which is ImageView
-                                myRef.addChildEventListener(new ChildEventListener() {
+                            myRef.addChildEventListener(new ChildEventListener() {
                                 String str = "";
                                 @Override
                                 public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
@@ -190,12 +142,14 @@ public class MainActivity extends AppCompatActivity {
 
                                 public void returnVal(DataSnapshot dataSnapshot) {
 
-                                    View cardView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.cardview, null);
+                                    View cardView = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.cardview, null);
                                     TextView tv = (TextView)cardView.findViewById(R.id.card_textview);
                                     ImageView imageView2 = (ImageView) cardView.findViewById(R.id.imageView4);
-                                        LinearLayout linearLayout = findViewById(R.id.layout1);
+                                    View main_cont = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.fragment_home, null);
+
+                                    LinearLayout linearLayout = binding.postsLayout;
                                     StorageReference mountainImagesRef = storageRef.child("images").child(dataSnapshot.child("image").getValue().toString());
-                                    Toast.makeText(MainActivity.this,
+                                    Toast.makeText(getActivity().getApplicationContext(),
                                             dataSnapshot.child("image").getValue().toString()+ "\nf75d18d9-04ef-47c1-85f7-f0d0fcacd030",
                                             Toast.LENGTH_SHORT).show();
                                     mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -204,18 +158,18 @@ public class MainActivity extends AppCompatActivity {
                                             // Got the download URL for 'users/me/profile.png'
                                             // Pass it to Picasso to download, show in ImageView and caching
                                             if (uri!=null){
-                                            Picasso.get().load(uri.toString()).into(imageView2);
-                                        }}
+                                                Picasso.get().load(uri.toString()).into(imageView2);
+                                            }}
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception exception) {
-                                            Toast.makeText(MainActivity.this,
+                                            Toast.makeText(getActivity().getApplicationContext(),
                                                     "fail",
                                                     Toast.LENGTH_SHORT).show();
                                         }
                                     });
-                                        tv.setText(dataSnapshot.child("nickname").getValue().toString()+": "+dataSnapshot.child("desc_text").getValue().toString());
-                                        linearLayout.addView(cardView);
+                                    tv.setText(dataSnapshot.child("nickname").getValue().toString()+": "+dataSnapshot.child("desc_text").getValue().toString());
+                                    linearLayout.addView(cardView);
 
 
 
@@ -243,54 +197,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        button2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
-                FirebaseAuth.getInstance().signOut();
-                Toast.makeText(MainActivity.this, "You have logged out",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-        button_reg.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent main_page = new Intent (MainActivity.this, RegisterPage.class);
-                startActivity(main_page);
-            }
-        });
-        button_cr_post.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent main_page = new Intent (MainActivity.this, CreatePost.class);
-                startActivity(main_page);
-            }
-        });
-        button_conc.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent main_page = new Intent (MainActivity.this, First_script.class);
-                startActivity(main_page);
-            }
-        });
-        button_info.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                setContentView(R.layout.club_profile);
-
-            }
-        });
-        button_join.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent main_page = new Intent (MainActivity.this, Club_Join.class);
-                startActivity(main_page);
-            }
-        });
-        button_log.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent main_page = new Intent (MainActivity.this, LoginPage.class);
-                startActivity(main_page);
-            }
-        });
-
-
-
+        return root;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

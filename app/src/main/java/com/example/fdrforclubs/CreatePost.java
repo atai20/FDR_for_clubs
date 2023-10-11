@@ -49,7 +49,7 @@ public class CreatePost extends AppCompatActivity {
 
 
     // Create a reference to 'images/mountains.jpg'
-    StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
+
 
 // While the file names are the same, the references point to different files
         //mountainsRef.getName().equals(mountainImagesRef.getName());
@@ -123,6 +123,7 @@ public class CreatePost extends AppCompatActivity {
         }
     }
     public String image_path;
+    String filename = UUID.randomUUID().toString();
     private void UploadImage()
     {
         if (filePath != null) {
@@ -132,13 +133,12 @@ public class CreatePost extends AppCompatActivity {
                     = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
-
             // Defining the child of storageReference
             StorageReference ref
                     = storageRef
                     .child(
                             "images/"
-                                    + UUID.randomUUID().toString());
+                                    + filename);
 
             // adding listeners on upload
             // or failure of image
@@ -262,11 +262,11 @@ public class CreatePost extends AppCompatActivity {
                     MainActivity mainActivity = new MainActivity();
                     Toast.makeText(CreatePost.this, mainActivity.user_club_name,
                             Toast.LENGTH_SHORT).show();
-                    if(!MainActivity.user_status.equals(null)){
+                    if(MainActivity.user_status!=null){
                         UploadImage();
-                        new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail(), image_path.toString());
+                        new_pos = new MainActivity.Post(post_text.getText().toString(), currentUser.getEmail(), filename);
 
-                        myRef.child(MainActivity.user_club_name).child("posts").push().setValue(new_pos);
+                        myRef.child("chess").child("posts").push().setValue(new_pos);
 
 
                         Toast.makeText(CreatePost.this, mainActivity.user_club_name,
@@ -287,15 +287,5 @@ public class CreatePost extends AppCompatActivity {
         });
     }
 
-    public void returnVal(DataSnapshot dataSnapshot) {
 
-        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-            if(dsp.getValue()!=null){
-                Toast.makeText(CreatePost.this, dsp.child("club").getValue().toString(),
-                        Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(CreatePost.this, "no value here",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }}
 }
