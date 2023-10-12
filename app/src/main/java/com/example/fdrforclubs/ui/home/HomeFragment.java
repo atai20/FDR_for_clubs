@@ -43,6 +43,11 @@ import com.squareup.picasso.Picasso;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
+    public static String user_name3;
+    public static String user_club_name;
+    public static String user_status;
+    public static String user_name2;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,8 +77,8 @@ public class HomeFragment extends Fragment {
 
 
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+         binding = FragmentHomeBinding.inflate(inflater, container, false);
+         View root = binding.getRoot();
 
 
          if (currentUser!=null) {
@@ -87,8 +92,9 @@ public class HomeFragment extends Fragment {
                         Log.e("firebaseno", task.getResult().child("status").getValue().toString(), task.getException());
                         String stat = task.getResult().child("status").getValue().toString();
                         if (!stat.equals(null)) {
-                            String user_club_name = task.getResult().child("club").getValue().toString();
-                            String user_status = task.getResult().child("status").getValue().toString();
+                            user_name3 = task.getResult().child("name").getValue().toString();
+                            user_club_name = task.getResult().child("club").getValue().toString();
+                            user_status = task.getResult().child("status").getValue().toString();
                             TextView textView = new TextView(new ContextThemeWrapper(getActivity().getApplicationContext(), R.style.CardView1), null, 0);
 
 
